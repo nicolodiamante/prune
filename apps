@@ -1,0 +1,8 @@
+#
+# Prune - Manage a list of apps to exclude from the Launchpad.
+#
+
+
+applications=(
+
+)

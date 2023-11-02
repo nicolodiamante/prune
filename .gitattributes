@@ -1,0 +1,11 @@
+#
+# Exclude these files from release archives.
+#
+
+.gitattributes           export-ignore
+.gitignore               export-ignore
+
+
+# Auto detect text files and perform LF normalization
+* text=auto
+eol=lf
