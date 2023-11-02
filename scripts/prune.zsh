@@ -61,6 +61,7 @@ update_pruneops() {
   applications=("${(@f)$(awk -F"'" '/\047/ {print $2}' "$APPLICATIONS_FILE")}")
 
   # Add shebang to the temporary file and leave a blank line
+  echo "#!/bin/zsh" > "$TEMP_FILE"
   echo "" >> "$TEMP_FILE"
 
   # Start the cleanup commands with 'sudo'
