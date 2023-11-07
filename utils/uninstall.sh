@@ -24,9 +24,9 @@ fi
 
 # Check if .zshrc contains the prune alias and remove it
 if [[ -f "$ZSHRC" ]]; then
-  if grep -q "alias prune=" "$ZSHRC"; then
+  if grep -q "alias prune=" "${ZSHRC}"; then
     # Use sed to remove the alias line
-    sed -i '' '/alias prune=/d' "$ZSHRC" && echo "Prune alias removed from .zshrc." || { echo "Failed to remove Prune alias from .zshrc." >&2; exit 1; }
+    sed -i '' '/alias prune=/d' "${ZSHRC}" && echo "Prune alias removed from .zshrc." || { echo "Failed to remove Prune alias from .zshrc." >&2; exit 1; }
   else
     echo "Prune alias not found in .zshrc, skipping removal."
   fi
@@ -37,7 +37,7 @@ fi
 # Optionally, you can also remove the logs directory
 LOG_DIR="${HOME}/prune/logs"
 if [[ -d "$LOG_DIR" ]]; then
-  rm -rf "$LOG_DIR" && echo "Prune logs directory removed." || { echo "Failed to remove Prune logs directory." >&2; exit 1; }
+  rm -rf "${LOG_DIR}" && echo "Prune logs directory removed." || { echo "Failed to remove Prune logs directory." >&2; exit 1; }
 else
   echo "Prune logs directory does not exist, skipping removal."
 fi

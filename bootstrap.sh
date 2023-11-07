@@ -10,14 +10,14 @@ TARGET="${HOME}/prune"
 TAR_CMD="tar -xzv -C \"${TARGET}\" --strip-components 1 --exclude '{.gitignore,*.md}'"
 INSTALL="${TARGET}/utils/install.sh"
 
-# Check if a command is executable
+# Check if a command is executable.
 is_executable() {
-  command -v "$1" &> /dev/null
+  command -v "$1" &> /dev/null 2>&1
 }
 
 # Ensure TARGET directory doesn't already exist.
 if [[ -d "$TARGET" ]]; then
-  echo "Target directory $TARGET already exists. Please remove or rename it and try again."
+  echo "Target directory ${TARGET} already exists. Please remove or rename it and try again."
   exit 1
 fi
 
@@ -35,12 +35,12 @@ fi
 
 echo 'Installing Prune...'
 
-# Create the target directory and proceed with the chosen download method
-mkdir -p "$TARGET" || { echo "Failed to create target directory. Aborting!"; exit 1; }
+# Create the target directory and proceed with the chosen download method.
+mkdir -p "${TARGET}" || { echo "Failed to create target directory. Aborting!"; exit 1; }
 
-if eval "$CMD"; then
-  # Navigate to the target directory and run the installation script
-  cd "$TARGET" && zsh "$INSTALL" || { echo "Failed to navigate to $TARGET or run the install script. Aborting!"; exit 1; }
+if eval "${CMD}"; then
+  # Navigate to the target directory and source the installation script.
+  cd "${TARGET}" && source "${INSTALL}" || { echo "Failed to navigate to ${TARGET} or run the install script. Aborting!"; exit 1; }
 else
   echo "Download failed. Aborting!"
   exit 1
