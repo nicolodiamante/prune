@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 #
-# Install Prune
+# Install Prune.
 #
 
 # Validate OS and version.
@@ -102,7 +102,7 @@ if [[ -f "$ZSHRC" ]]; then
 
   if ! grep -q "alias prune=" "$ZSHRC"; then
     cat << EOF >> "$ZSHRC"
-# Launch the Prune script.
+# Run the Prune script.
 alias prune='${HOME}/prune/scripts/prune.zsh'
 EOF
     echo "Prune alias added to .zshrc"
@@ -118,7 +118,7 @@ else
   echo "Adding 'prune' alias to new .zshrc..."
   cat << EOF >> "$ZSHRC"
 
-# Launch the Prune script.
+# Run the Prune script.
 alias prune='${HOME}/prune/scripts/prune.zsh'
 EOF
   echo "Prune alias added to a new .zshrc."

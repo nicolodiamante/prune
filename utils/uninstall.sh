@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 #
-# Uninstall Prune
+# Uninstall Prune.
 #
 
 # Defines the PATHs.
@@ -66,9 +66,11 @@ if [[ -f "$ZSHRC" ]]; then
     # Use 'sed' to remove lines related to Prune.
     if [[ "$OSTYPE" == "darwin"* ]]; then
       # macOS requires an empty string as an argument to -i.
+      sed -i '' '/# Run the Prune script./d' "$ZSHRC"
       sed -i '' '/alias prune=/d' "$ZSHRC"
     else
       # Linux does not require an empty string as an argument to -i.
+      sed -i '/# Run the Prune script./d' "$ZSHRC"
       sed -i '/alias prune=/d' "$ZSHRC"
     fi
     echo "Prune configurations have been removed from .zshrc."
