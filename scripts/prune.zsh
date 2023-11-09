@@ -4,7 +4,7 @@
 # Prune - Remove superfluous icons in the Launchpad.
 #
 
-# Directory paths.
+# Directory PATHs.
 ROOT_DIR="${0:h}/../"
 SCRIPTS_DIR="${ROOT_DIR}scripts/"
 
@@ -17,7 +17,7 @@ TEMP_FILE="${SCRIPTS_DIR}temp_pruneops"
 # File containing the cleanup commands.
 PRUNEOPS_FILE="${SCRIPTS_DIR}.pruneops.zsh"
 
-# Define paths.
+# Define PATHs.
 LIB_AGENTS="${HOME}/Library/LaunchAgents"
 AGENT="${LIB_AGENTS}/com.shell.Prune.plist"
 PLIST_FILE='com.shell.Prune.plist'
@@ -27,7 +27,7 @@ LOG_FILE="${ROOT_DIR}/log/prune.log"
 
 # Function to display usage information.
 usage() {
-  echo "Usage: prune [option]"
+  echo "Usage: prune [OPTION]"
   echo "Options:"
   echo "  -l, --load      Load the Prune agent."
   echo "  -u, --unload    Unload the Prune agent."

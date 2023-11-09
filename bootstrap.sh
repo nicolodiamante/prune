@@ -1,18 +1,21 @@
 #!/bin/zsh
 
 # Determines the current user's shell.
-[[ "$SHELL" == */zsh ]] || { echo "Please switch to zsh shell to continue."; exit 1; }
+if [[ "$SHELL" != */zsh ]]; then
+  echo "Please switch to zsh shell to continue."
+  exit 1
+fi
 
-# Define paths.
+# Defines the PATHs.
 SOURCE="https://github.com/nicolodiamante/prune"
 TARBALL="${SOURCE}/tarball/master"
 TARGET="${HOME}/prune"
-TAR_CMD="tar -xzv -C \"${TARGET}\" --strip-components 1 --exclude '{.gitignore,*.md}'"
+TAR_CMD="tar -xzv -C \"${TARGET}\" --strip-components 1 --exclude .gitignore"
 INSTALL="${TARGET}/utils/install.sh"
 
 # Check if a command is executable.
 is_executable() {
-  command -v "$1" &> /dev/null 2>&1
+  command -v "$1" &> /dev/null
 }
 
 # Ensure TARGET directory doesn't already exist.
@@ -36,12 +39,23 @@ fi
 echo 'Installing Prune...'
 
 # Create the target directory and proceed with the chosen download method.
-mkdir -p "${TARGET}" || { echo "Failed to create target directory. Aborting!"; exit 1; }
+if ! mkdir -p "${TARGET}"; then
+  echo "Error: Failed to create target directory. Aborting!" >&2
+  exit 1
+fi
 
+# Execute the download command and run the installation script.
 if eval "${CMD}"; then
-  # Navigate to the target directory and source the installation script.
-  cd "${TARGET}" && source "${INSTALL}" || { echo "Failed to navigate to ${TARGET} or run the install script. Aborting!"; exit 1; }
+  if cd "${TARGET}"; then
+    if ! source "${INSTALL}"; then
+      echo "Error: Failed to run the install script. Aborting!" >&2
+      exit 1
+    fi
+  else
+    echo "Error: Failed to navigate to ${TARGET}. Aborting!" >&2
+    exit 1
+  fi
 else
-  echo "Download failed. Aborting!"
+  echo "Download failed. Aborting!" >&2
   exit 1
 fi

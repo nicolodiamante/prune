@@ -4,42 +4,92 @@
 # Uninstall Prune
 #
 
-# Define paths
+# Defines the PATHs.
 LIB_AGENTS="${HOME}/Library/LaunchAgents"
 AGENT="${LIB_AGENTS}/com.shell.Prune.plist"
 ZSHRC="${XDG_CONFIG_HOME:-$HOME}/.zshrc"
 
-# Remove the agent from launchd if the plist file exists
+# Unload the agent if the plist file exists.
+echo "Checking for the Prune agent to unload..."
 if [[ -f "${AGENT}" ]]; then
-  launchctl unload "${AGENT}" && echo "Agent unloaded successfully." || { echo "Failed to unload the agent." >&2; exit 1; }
-fi
-
-# Check if the file is a symlink before attempting to remove
-if [[ -L "${AGENT}" ]]; then
-  # Remove the agent file
-  rm -f "${AGENT}" && echo "Successfully removed the agent symlink." || { echo "Failed to remove the agent symlink." >&2; exit 1; }
-else
-  echo "The agent symlink does not exist, skipping removal."
-fi
-
-# Check if .zshrc contains the prune alias and remove it
-if [[ -f "$ZSHRC" ]]; then
-  if grep -q "alias prune=" "${ZSHRC}"; then
-    # Use sed to remove the alias line
-    sed -i '' '/alias prune=/d' "${ZSHRC}" && echo "Prune alias removed from .zshrc." || { echo "Failed to remove Prune alias from .zshrc." >&2; exit 1; }
+  if launchctl unload "${AGENT}"; then
+    echo "Prune agent unloaded successfully."
+    # Remove the plist file after unloading.
+    rm -f "${AGENT}" && echo "Prune agent plist file removed."
   else
-    echo "Prune alias not found in .zshrc, skipping removal."
+    echo "Failed to unload the Prune agent." >&2
+    exit 1
   fi
 else
-  echo "zshrc file does not exist, skipping alias removal."
+  echo "Prune agent plist file does not exist or has already been unloaded."
 fi
 
-# Optionally, you can also remove the logs directory
-LOG_DIR="${HOME}/prune/logs"
-if [[ -d "$LOG_DIR" ]]; then
-  rm -rf "${LOG_DIR}" && echo "Prune logs directory removed." || { echo "Failed to remove Prune logs directory." >&2; exit 1; }
+# Check for .zshrc and back it up before making changes.
+if [[ -f "$ZSHRC" ]]; then
+  echo "Found .zshrc at ${ZSHRC}."
+
+  # Check for existing backups.
+  existing_backups=( ${ZSHRC}.bak_* )
+  if (( ${#existing_backups[@]} > 0 )); then
+    # Sort backups by date, descending.
+    sorted_backups=($(echo "${existing_backups[@]}" | tr ' ' '\n' | sort -r))
+    latest_backup=${sorted_backups[0]}
+    echo "Latest backup found at ${latest_backup}."
+    read -q "REPLY?Do you want to restore the latest backup instead of creating a new one? [y/N] "
+    echo ""
+    if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+      # Restore the latest backup.
+      if ! cp "$latest_backup" "$ZSHRC"; then
+        echo "Failed to restore .zshrc from the latest backup." >&2
+        exit 1
+      else
+        echo "Restored .zshrc from the latest backup."
+      fi
+    fi
+  fi
+
+  if [[ "$REPLY" =~ ^[Nn]$ ]] || [[ -z "$REPLY" ]]; then
+    # If the user chooses not to use the latest backup, create a new one.
+    BACKUP="${ZSHRC}.bak_$(date +%F-%H%M%S)"
+    if ! cp "$ZSHRC" "${BACKUP}"; then
+      echo "Failed to backup .zshrc." >&2
+      exit 1
+    else
+      echo "Backup saved as ${BACKUP}."
+    fi
+  fi
+
+  # Prompt the user before removing the Prune alias.
+  read -q "REPLY?Do you want to remove the Prune alias from .zshrc? [y/N] "
+  echo ""
+  if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+    # Use 'sed' to remove lines related to Prune.
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      # macOS requires an empty string as an argument to -i.
+      sed -i '' '/alias prune=/d' "$ZSHRC"
+    else
+      # Linux does not require an empty string as an argument to -i.
+      sed -i '/alias prune=/d' "$ZSHRC"
+    fi
+    echo "Prune configurations have been removed from .zshrc."
+  else
+    echo "No changes made to .zshrc."
+  fi
 else
-  echo "Prune logs directory does not exist, skipping removal."
+  echo ".zshrc file not found. No cleanup needed."
 fi
 
-echo "Uninstallation of Prune is complete."
+# Optionally, remove the logs directory.
+echo "Checking for the Prune logs directory to remove..."
+if [[ -d "$LOG_DIR" ]]; then
+  if rm -rf "$LOG_DIR"; then
+    echo "Prune logs directory removed."
+  else
+    echo "Failed to remove the Prune logs directory." >&2
+    exit 1
+  fi
+else
+  echo "Prune logs directory not found, no removal necessary."
+fi
+
+echo "Prune uninstallation completed."
