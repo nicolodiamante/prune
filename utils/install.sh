@@ -4,9 +4,9 @@
 # Install Prune.
 #
 
-# Validate OS and version.
-if [[ "$OSTYPE" != darwin* ]]; then
-  echo "This script is only compatible with macOS." >&2
+# Validate OS.
+if [[ "$OSTYPE" != "darwin"* ]]; then
+  echo "This script is only compatible with macOS" >&2
   exit 1
 fi
 
