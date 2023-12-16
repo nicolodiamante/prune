@@ -5,7 +5,7 @@
   </picture>
 </p>
 
-The [Launchpad][apple-launchpad] on a Mac serves as a quick access hub to all installed applications. With a simple gesture or a click, it displays an easy-to-navigate grid of app icons, providing a user-friendly way to launch applications without digging through the Applications folder. However, over time, as more applications get installed, the Launchpad can become cluttered with icons, including those of seldom-used or obsolete apps. This accumulation of icons can hinder the easy access to frequently used apps, transforming a feature initially intended for convenience into a source of potential annoyance.
+The [Launchpad][apple-launchpad] on a Mac serves as a quick access hub to all installed applications. With a simple gesture or a click, it displays an easy-to-navigate grid of app icons, providing a user-friendly way to launch applications without digging through the Applications folder. However, over time, as more applications get installed, the Launchpad can become cluttered with icons, including those of seldom-used or obsolete apps. This accumulation of icons can hinder easy access to frequently used apps, transforming a feature initially intended for convenience into a source of potential annoyance.
 
 Prune is a script designed to automate the removal of specified apps from the Launchpad, helping maintain a clean, tidy, and efficient app launch interface. By specifying which apps you want to keep or remove through a simple configuration, Prune takes care of the rest. It delves into the system, meticulously removes the selected apps from the Launchpad, and leaves it in a clean and organised state.
 
@@ -81,7 +81,7 @@ This blend of automated and manual operation, fueled by a simple configuration, 
 
 ### How to Reset Launchpad Layout
 
-In case you wish to restore the Launchpad to its original state, erasing the customisations made by Prune, a simple command is built into the script for this purpose. By invoking `prune --default` or `prune -d` in the terminal, the Launchpad will revert back to its default layout, including all apps and their original organisation. This action utilises a native macOS command to reset the Launchpad, ensuring a safe and straightforward return to the default setup. It's a quick way to undo Prune's changes, should you ever want to start afresh with your Launchpad organisation<br><br>
+In case you wish to restore the Launchpad to its original state, erasing the customisations made by Prune, a simple command is built into the script for this purpose. By invoking `prune --default` or `prune -d` in the terminal, the Launchpad will revert to its default layout, including all apps and their original organisation. This action utilises a native macOS command to reset the Launchpad, ensuring a safe and straightforward return to the default setup. It's a quick way to undo Prune's changes, should you ever want to start afresh with your Launchpad organisation<br><br>
 
 ### Loading and Unloading Prune Agent
 
@@ -123,11 +123,33 @@ A successful check should return the following output, indicating that the Prune
 
 If the Prune agent is not loaded, there will be no output.
 
-This verification step provides assurance that Prune is set up correctly and ready to keep your Launchpad organized. It's a handy tool for troubleshooting and confirming the agent's operational status.<br><br>
+This verification step assures that Prune is set up correctly and ready to keep your Launchpad organised. It's a handy tool for troubleshooting and confirming the agent's operational status.<br><br>
+
+### Removing a Specific App from the Launchpad
+
+Prune now offers the ability to remove a specific app from your Launchpad. This feature is useful when you want to declutter your Launchpad by removing individual apps without affecting others.
+
+To remove a specific app:
+
+```shell
+prune -r [AppName]
+```
+
+Replace `[AppName]` with the exact name of the app you wish to remove from the Launchpad.
+
+For example, to remove an app named `"QuickTime Player"`, you would use:
+
+```shell
+prune -r "QuickTime Player"
+```
+
+This command will instruct Prune to specifically remove the `"QuickTime Player"` from your Launchpad.
+
+**Note:** Be sure to use the exact name of the app as it appears in your Launchpad. The removal is case-sensitive and requires the full app name.<br><br>
 
 ### Accessing Help
 
-Prune comes with a built-in help option to provide quick access to its usage instructions right from the terminal. Whether you're unsure about how to reset the Launchpad layout or need a reminder about how to launch Prune, the help option is there to assist you. To access this, simply type `prune --help` or `prune -h` in the terminal. This will display a brief summary of available options and how to use them.<br><br>
+Prune comes with a built-in help option to provide quick access to its usage instructions right from the terminal. Whether you're unsure about how to reset the Launchpad layout or need a reminder about how to launch Prune, the help option is there to assist you. To access this, simply type `prune --help` or `prune -h` in the terminal. This will display a summary of available options and how to use them.<br><br>
 
 ## Notes
 
@@ -161,9 +183,9 @@ Any suggestions or feedback you may have for improvement are welcome. If you enc
 </p>
 
 <p align="center">
-  <picture>
-    <img src="https://github.com/nicolodiamante/prune/assets/48920263/5deb9f27-b6ed-474b-8095-bc221cee1ea0" draggable="false" ondragstart="return false;" alt="Nicol&#242; Diamante" title="Nicol&#242; Diamante" width="17px" />
-  </picture>
+  <a href="https://nicolodiamante.com" target="_blank">
+    <img src="https://github.com/nicolodiamante/prune/assets/48920263/5deb9f27-b6ed-474b-8095-bc221cee1ea0" draggable="false" ondragstart="return false;" alt="Nicol&#242; Diamante Portfolio" title="Nicol&#242; Diamante" width="17px" />
+  </a>
 </p>
 
 <p align="center">

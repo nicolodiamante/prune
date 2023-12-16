@@ -33,6 +33,7 @@ usage() {
   echo "  -u, --unload    Unload the Prune agent."
   echo "  -d, --default   Reset the Launchpad layout to its default state."
   echo "  -c, --check     Check if the Prune agent is loaded."
+  echo "  -r, --remove    Remove a specific app from the Launchpad."
   echo "  -h, --help      Display this help message and exit."
   echo ""
   echo "For more help, visit: https://github.com/nicolodiamante/prune"
@@ -47,6 +48,19 @@ for cmd in "${required_commands[@]}"; do
   fi
 done
 
+# Function to remove a single app.
+remove_single_app() {
+  local app_to_remove=$1
+  local sqlite_cmd="sqlite3 \$(find /private/var/folders -name com.apple.dock.launchpad)/db/db \"DELETE FROM apps WHERE title='$app_to_remove';\" && killall Dock"
+
+  if ! sudo zsh -c "$sqlite_cmd" 2> "${LOG_FILE}"; then
+    echo "Failed to remove ${app_to_remove}. Check log for details." >&2
+    exit 1
+  else
+    echo "Removed ${app_to_remove} from the Launchpad!"
+  fi
+}
+
 # Parse command-line arguments.
 if [[ "$1" == "-h" || "$1" == "--help" ]]; then
   usage
@@ -57,7 +71,7 @@ elif [[ "$1" == "-c" || "$1" == "--check" ]]; then
 elif [[ "$1" == "-l" || "$1" == "--load" ]]; then
   if [[ -f "${AGENT}" ]]; then
     cd "${LIB_AGENTS}" && echo "loading ${PLIST_FILE}"
-    launchctl load ${PLIST_FILE} && popd > /dev/null 2>&1
+    launchctl load "${PLIST_FILE}" && popd > /dev/null 2>&1
   else
     echo "Prune agent plist file not found." >&2
   fi
@@ -70,6 +84,14 @@ elif [[ "$1" == "-u" || "$1" == "--unload" ]]; then
     echo "Prune agent plist file not found." >&2
   fi
   exit 0
+elif [[ "$1" == "-r" || "$1" == "--remove" ]]; then
+  if [[ -z "$2" ]]; then
+    echo "Error: No app name provided for removal."
+    exit 1
+  else
+    remove_single_app "${2}"
+    exit 0
+  fi
 fi
 
 # Function to update pruneops.zsh if the apps file has changed.
@@ -78,19 +100,19 @@ update_pruneops() {
   applications=("${(@f)$(awk -F"'" '/\047/ {print $2}' "$APPLICATIONS_FILE")}")
 
   # Add shebang to the temporary file and leave a blank line
-  echo "#!/bin/zsh" > "$TEMP_FILE"
-  echo "" >> "$TEMP_FILE"
+  echo "#!/bin/zsh" > "${TEMP_FILE}"
+  echo "" >> "${TEMP_FILE}"
 
   # Build the cleanup commands.
   for app in "${applications[@]:0:${#applications[@]}-1}"; do
-    echo -n "sqlite3 \$(find /private/var/folders -name com.apple.dock.launchpad)/db/db \"DELETE FROM apps WHERE title='$app';\"; " >> "$TEMP_FILE"
+    echo -n "sqlite3 \$(find /private/var/folders -name com.apple.dock.launchpad)/db/db \"DELETE FROM apps WHERE title='$app';\"; " >> "${TEMP_FILE}"
   done
 
   # Add the last command without the semicolon (;) divider, followed by '&& killall Dock'.
-  echo -n "sqlite3 \$(find /private/var/folders -name com.apple.dock.launchpad)/db/db \"DELETE FROM apps WHERE title='${applications[-1]}';\" && killall Dock" >> "$TEMP_FILE"
+  echo -n "sqlite3 \$(find /private/var/folders -name com.apple.dock.launchpad)/db/db \"DELETE FROM apps WHERE title='${applications[-1]}';\" && killall Dock" >> "${TEMP_FILE}"
 
   # Replace the existing pruneops.zsh file with the new commands.
-  mv "$TEMP_FILE" "$PRUNEOPS_FILE"
+  mv "${TEMP_FILE}" "${PRUNEOPS_FILE}"
 
   # Check if the mv operation was successful.
   if [[ $? -ne 0 ]]; then
@@ -100,13 +122,13 @@ update_pruneops() {
 
   # Set executable permission only if the file wasn't already executable.
   if [[ ! -x "$PRUNEOPS_FILE" ]]; then
-    chmod +x "$PRUNEOPS_FILE"
+    chmod +x "${PRUNEOPS_FILE}"
   fi
 }
 
 # Function to launch pruneops.zsh.
 manage_apps() {
-  local LAUNCHD_SCRIPTS="$PRUNEOPS_FILE"
+  local LAUNCHD_SCRIPTS="${PRUNEOPS_FILE}"
 
   # Check if sudo requires a password prompt.
   if ! sudo -n true 2>/dev/null; then
@@ -121,7 +143,7 @@ manage_apps() {
   else
     echo 'prune: removed superfluous icons from the Launchpad!'
     # If successful, remove the log file as it was created but it's empty.
-    rm -f "$LOG_FILE"
+    rm -f "${LOG_FILE}"
   fi
 }
 
