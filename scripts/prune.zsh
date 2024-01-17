@@ -5,17 +5,17 @@
 #
 
 # Directory PATHs.
-ROOT_DIR="${0:h}/../"
-SCRIPTS_DIR="${ROOT_DIR}scripts/"
+ROOT_DIR="${0:h}/.."
+SCRIPTS_DIR="${ROOT_DIR}/scripts"
 
 # File containing the list of applications.
 APPLICATIONS_FILE="${ROOT_DIR}/config/apps"
 
 # Temporary file for building the cleanup commands.
-TEMP_FILE="${SCRIPTS_DIR}temp_pruneops"
+TEMP_FILE="${SCRIPTS_DIR}/temp_pruneops"
 
 # File containing the cleanup commands.
-PRUNEOPS_FILE="${SCRIPTS_DIR}.pruneops.zsh"
+PRUNEOPS_FILE="${SCRIPTS_DIR}/.pruneops.zsh"
 
 # Define PATHs.
 LIB_AGENTS="${HOME}/Library/LaunchAgents"
@@ -99,7 +99,7 @@ update_pruneops() {
   # Read the new list of applications from the applications file.
   applications=("${(@f)$(awk -F"'" '/\047/ {print $2}' "$APPLICATIONS_FILE")}")
 
-  # Add shebang to the temporary file and leave a blank line
+  # Add shebang to the temporary file and leave a blank line.
   echo "#!/bin/zsh" > "${TEMP_FILE}"
   echo "" >> "${TEMP_FILE}"
 
@@ -111,7 +111,7 @@ update_pruneops() {
   # Add the last command without the semicolon (;) divider, followed by '&& killall Dock'.
   echo -n "sqlite3 \$(find /private/var/folders -name com.apple.dock.launchpad)/db/db \"DELETE FROM apps WHERE title='${applications[-1]}';\" && killall Dock" >> "${TEMP_FILE}"
 
-  # Replace the existing pruneops.zsh file with the new commands.
+  # Replace the existing pruneops.zsh file with the new commands
   mv "${TEMP_FILE}" "${PRUNEOPS_FILE}"
 
   # Check if the mv operation was successful.

@@ -21,7 +21,7 @@ SOURCE="https://github.com/nicolodiamante/prune"
 TARBALL="${SOURCE}/tarball/master"
 TARGET="${HOME}/prune"
 TAR_CMD="tar -xzv -C \"${TARGET}\" --strip-components 1 --exclude .gitignore"
-INSTALL="${TARGET}/utils/install.sh"
+INSTALL="${TARGET}/utils/install.zsh"
 
 # Check if a command is executable.
 is_executable() {

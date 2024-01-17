@@ -25,7 +25,7 @@ Prune is a script designed to automate the removal of specified apps from the La
 The installation process of Prune is streamlined for simplicity. You can automatically download and install Prune via `curl` by executing the following command in your terminal:
 
 ```shell
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/nicolodiamante/prune/HEAD/bootstrap.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/nicolodiamante/prune/HEAD/bootstrap.zsh)"
 ```
 
 If you prefer a more manual approach, you can clone the repository to your local machine using `git` with the command:
@@ -34,10 +34,10 @@ If you prefer a more manual approach, you can clone the repository to your local
 git clone https://github.com/nicolodiamante/prune.git
 ```
 
-After cloning the repository, navigate to its directory in the terminal, then move to the `utils` subdirectory and run the installation script `install.sh` as follows:
+After cloning the repository, navigate to its directory in the terminal and run the installation script as follows:
 
 ```shell
-source install.sh
+source utils/install.zsh
 ```
 
 When you run the installation script, it performs two main actions to set up Prune on your system. Firstly, it copies the agent files into the `~/Library/LaunchAgents` directory. This step ensures that the necessary agent files are placed in the correct location, allowing the system to recognise and execute them as needed. Secondly, the script adds an alias to your shell configuration file `.zshrc`, making it easier for you to invoke Prune from the terminal.

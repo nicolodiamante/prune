@@ -4,17 +4,17 @@
 # Install Prune.
 #
 
-# Validate OS.
+# Check if macOS.
 if [[ "$OSTYPE" != "darwin"* ]]; then
   echo "This script is only compatible with macOS" >&2
   exit 1
 fi
 
-# Validate macOS version.
-SW_VERS=$(sw_vers -buildVersion)
-OS_VERS=$(sed -E -e 's/([0-9]{2}).*/\1/' <<<"$SW_VERS")
-if [[ "$OS_VERS" -lt 21 ]]; then
-  echo "Prune requires macOS 12.6.1 Monterey or later." >&2
+# Check if macOS Monterey or later.
+SW_VERS=$(sw_vers --productVersion)
+OS_VERS=$(echo "$SW_VERS" | cut -d '.' -f 1)
+if [[ "$OS_VERS" -lt 12 ]]; then
+  echo "Prune requires macOS Monterey (v12) or later." >&2
   exit 1
 fi
 
@@ -22,15 +22,15 @@ fi
 LIB_AGENTS="${HOME}/Library/LaunchAgents"
 AGENT_SOURCE="${HOME}/prune/agent/com.shell.Prune.plist"
 AGENT_TARGET="${LIB_AGENTS}/com.shell.Prune.plist"
-ZSHRC="${XDG_CONFIG_HOME:-$HOME}/.zshrc"
+ZSHRC="${ZDOTDIR:-$HOME}/.zshrc"
 
 # Log directory and file.
-ROOT_DIR="${0:h}/../"
-LOG_DIR="${ROOT_DIR}log"
+ROOT_DIR="${0:h}/.."
+LOG_DIR="${ROOT_DIR}/log"
 
 # Ensure the logs directory exists.
 echo "Checking for the logs directory..."
-if ! [[ -d "$LOG_DIR" ]]; then
+if [[ ! -d "$LOG_DIR" ]]; then
   echo "Creating the logs directory..."
   if ! mkdir -p "${LOG_DIR}"; then
     echo "Failed to create log directory." >&2
@@ -43,7 +43,7 @@ fi
 
 # Ensure the agents directory exists.
 echo "Checking for the LaunchAgents directory..."
-if ! [[ -d "$LIB_AGENTS" ]]; then
+if [[ ! -d "$LIB_AGENTS" ]]; then
   echo "Creating the LaunchAgents directory..."
   if ! mkdir -p "${LIB_AGENTS}"; then
     echo "Failed to create LaunchAgents directory." >&2
@@ -56,16 +56,18 @@ fi
 
 # Verify if the source agent file exists.
 echo "Checking for the agent source file..."
-if ! [[ -f "$AGENT_SOURCE" ]]; then
+if [[ ! -f "$AGENT_SOURCE" ]]; then
   echo "Agent source file not found: ${AGENT_SOURCE}" >&2
   exit 1
 else
-  echo "Agent source file found."
+  # Update plist file with actual home directory.
+  sed -i '' "s|@USER_HOME@|${HOME}|g" "${AGENT_SOURCE}"
+  echo "Updated the home directory in the Agent."
 fi
 
 # Create a symbolic link for the agent.
 echo "Setting up the agent symbolic link..."
-if ! [[ -L "$AGENT_TARGET" ]]; then
+if [[ ! -L "$AGENT_TARGET" ]]; then
   if ! ln -s "${AGENT_SOURCE}" "${AGENT_TARGET}"; then
     echo "Failed to create symbolic link for the agent." >&2
     exit 1
@@ -89,38 +91,32 @@ else
   echo "Agent file does not exist, no need to load."
 fi
 
-# Backup .zshrc before updating.
+# Update .zshrc with Prune alias.
 if [[ -f "$ZSHRC" ]]; then
-  BACKUP="${ZSHRC}.bak_$(date +%F-%H%M%S)"
-  echo "Backing up .zshrc..."
-  if ! cp "${ZSHRC}" "${BACKUP}"; then
-    echo "Failed to backup .zshrc." >&2
-    exit 1
-  else
-    echo "Backup of .zshrc saved as ${BACKUP}."
-  fi
+  echo "Updating .zshrc..."
 
-  if ! grep -q "alias prune=" "$ZSHRC"; then
-    cat << EOF >> "$ZSHRC"
-# Run the Prune script.
-alias prune='${HOME}/prune/scripts/prune.zsh'
-EOF
-    echo "Prune alias added to .zshrc"
+  # Check if the alias already exists.
+  if ! grep -q "alias prune=" "${ZSHRC}"; then
+    echo "" >> "${ZSHRC}"
+    echo "# Run the Prune script." >> "${ZSHRC}"
+    echo "alias prune='${HOME}/prune/scripts/prune.zsh'" >> "${ZSHRC}"
+    echo "Prune alias added to .zshrc."
   else
-    echo "Prune alias already exists in .zshrc"
+    echo "Prune alias already exists in .zshrc."
   fi
 else
-  echo ".zshrc not found, attempting to create a new one..."
-  if ! touch "$ZSHRC"; then
+  # .zshrc not found, create a new one.
+  echo ".zshrc not found, creating a new one..."
+  if ! touch "${ZSHRC}"; then
     echo "Failed to create .zshrc." >&2
     exit 1
   fi
-  echo "Adding 'prune' alias to new .zshrc..."
-  cat << EOF >> "$ZSHRC"
 
-# Run the Prune script.
-alias prune='${HOME}/prune/scripts/prune.zsh'
-EOF
+  # Add the alias to the new .zshrc file.
+  echo "Adding 'prune' alias to new .zshrc..."
+  echo "" >> "${ZSHRC}"
+  echo "# Run the Prune script." >> "${ZSHRC}"
+  echo "alias prune='${HOME}/prune/scripts/prune.zsh'" >> "${ZSHRC}"
   echo "Prune alias added to a new .zshrc."
 fi
 
@@ -128,3 +124,5 @@ fi
 if ! source "${ZSHRC}" &>/dev/null; then
   echo "Please source .zshrc manually to apply changes." >&2
 fi
+
+echo "Prune setup complete."

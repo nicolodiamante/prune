@@ -2,7 +2,6 @@
 # Prune - Manage a list of apps to exclude from the Launchpad.
 #
 
-
+# `App Name`
 applications=(
-# `APP NAME`
 )
