@@ -25,7 +25,7 @@ Prune is a script designed to automate the removal of specified apps from the La
 The installation process of Prune is streamlined for simplicity. You can automatically download and install Prune via `curl` by executing the following command in your terminal:
 
 ```shell
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/nicolodiamante/prune/HEAD/bootstrap.zsh)"
+zsh -c "$(curl -fsSL https://raw.githubusercontent.com/nicolodiamante/prune/HEAD/bootstrap.zsh)"
 ```
 
 If you prefer a more manual approach, you can clone the repository to your local machine using `git` with the command:
