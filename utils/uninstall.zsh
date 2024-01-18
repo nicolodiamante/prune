@@ -33,9 +33,13 @@ if [[ -f "$ZSHRC" ]]; then
     read -q "REPLY?Do you want to remove the Prune alias from .zshrc? [y/N] "
     echo ""
     if [[ "$REPLY" =~ ^[Yy]$ ]]; then
-      # Use 'sed' to remove lines related to Prune.
-      sed -i '' '/# Run the Prune script./d' "$ZSHRC"
-      sed -i '' '/alias prune=/d' "$ZSHRC"
+      if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' '/# Run the Prune script./d' "$ZSHRC"
+        sed -i '' '/alias prune=/d' "$ZSHRC"
+      else
+        sed -i '/# Run the Prune script./d' "$ZSHRC"
+        sed -i '/alias prune=/d' "$ZSHRC"
+      fi
       echo "Prune alias removed from .zshrc."
     else
       echo "No changes made to .zshrc."
