@@ -65,4 +65,4 @@ else
   echo "Prune: Logs directory not removed."
 fi
 
-echo "Prune: Uninstall completed."
+echo "Prune: Uninstall complete."
