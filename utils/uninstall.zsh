@@ -11,44 +11,44 @@ ZSHRC="${ZDOTDIR:-$HOME}/.zshrc"
 LOG_DIR="${HOME}/prune/log" # Update this path as needed.
 
 # Unload the agent if the plist file exists.
-echo "Checking for the Prune agent to unload..."
+echo "Prune: Checking for the agent to unload..."
 if [[ -f "${AGENT}" ]]; then
   if launchctl unload "${AGENT}"; then
-    echo "Prune agent unloaded successfully."
+    echo "Prune: Agent unloaded successfully."
     # Remove the plist file after unloading.
     rm -f "${AGENT}" && echo "Prune agent plist file removed."
   else
-    echo "Failed to unload the Prune agent." >&2
+    echo "Prune: Failed to unload the Prune agent." >&2
     exit 1
   fi
 else
-  echo "Prune agent plist file does not exist or has already been unloaded."
+  echo "Prune: Agent plist file does not exist or has already been unloaded."
 fi
 
 # Prompt the user before removing the Prune alias.
 if [[ -f "$ZSHRC" ]]; then
-  echo "Checking for Prune alias in .zshrc..."
+  echo "Prune: Checking for Prune alias in .zshrc..."
   echo "ZSHRC is set to: $ZSHRC"
   if grep -q "alias prune=" "${ZSHRC}"; then
     read -q "REPLY?Do you want to remove the Prune alias from .zshrc? [y/N] "
     echo ""
     if [[ "$REPLY" =~ ^[Yy]$ ]]; then
       if [[ "$OSTYPE" == "darwin"* ]]; then
-        sed -i '' '/# Run the Prune script./d' "$ZSHRC"
+        sed -i '' '/# Launch Prune./d' "$ZSHRC"
         sed -i '' '/alias prune=/d' "$ZSHRC"
       else
-        sed -i '/# Run the Prune script./d' "$ZSHRC"
+        sed -i '/# Launch Prune./d' "$ZSHRC"
         sed -i '/alias prune=/d' "$ZSHRC"
       fi
-      echo "Prune alias removed from .zshrc."
+      echo "Prune: Alias removed from .zshrc."
     else
-      echo "No changes made to .zshrc."
+      echo "Prune: No changes made to .zshrc."
     fi
   else
-    echo "Prune alias not found in .zshrc."
+    echo "Prune: Alias not found in .zshrc."
   fi
 else
-  echo ".zshrc file not found. No cleanup needed."
+  echo "Prune: .zshrc file not found. No cleanup needed."
 fi
 
 # Optionally, remove the logs directory.
@@ -56,13 +56,13 @@ read -q "REPLY?Do you want to remove the Prune logs directory? [y/N] "
 echo ""
 if [[ "$REPLY" =~ ^[Yy]$ ]] && [[ -d "$LOG_DIR" ]]; then
   if rm -rf "$LOG_DIR"; then
-    echo "Prune logs directory removed."
+    echo "Prune: Logs directory removed."
   else
-    echo "Failed to remove the Prune logs directory." >&2
+    echo "Prune: Failed to remove the Prune logs directory." >&2
     exit 1
   fi
 else
-  echo "Prune logs directory not removed."
+  echo "Prune: Logs directory not removed."
 fi
 
-echo "Prune uninstallation completed."
+echo "Prune: Uninstall completed."

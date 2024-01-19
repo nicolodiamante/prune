@@ -6,16 +6,17 @@
 
 # Directory PATHs.
 ROOT_DIR="${0:h}/.."
-SCRIPTS_DIR="${ROOT_DIR}/scripts"
+INIT="${ROOT_DIR}/init"
 
 # File containing the list of applications.
 APPLICATIONS_FILE="${ROOT_DIR}/config/apps"
 
 # Temporary file for building the cleanup commands.
-TEMP_FILE="${SCRIPTS_DIR}/temp_pruneops"
+TEMP_FILE="${INIT}/temp_pruneops"
 
 # File containing the cleanup commands.
-PRUNEOPS_FILE="${SCRIPTS_DIR}/.pruneops.zsh"
+PRUNEOPS_FILE="${INIT}/.pruneops.zsh"
+PRUNEINIT_FILE="${INIT}/.pruneinit.zsh"
 
 # Define PATHs.
 LIB_AGENTS="${HOME}/Library/LaunchAgents"

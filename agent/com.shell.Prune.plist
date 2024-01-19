@@ -6,7 +6,7 @@
     <string>com.shell.Prune</string>
     <key>ProgramArguments</key>
     <array>
-      <string>@USER_HOME@/.scripts/pruneops.zsh</string>
+      <string>@USER_HOME@/prune/init/.pruneops.zsh</string>
     </array>
     <key>RunAtLoad</key>
     <true/>

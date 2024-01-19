@@ -29,100 +29,100 @@ ROOT_DIR="${0:h}/.."
 LOG_DIR="${ROOT_DIR}/log"
 
 # Ensure the logs directory exists.
-echo "Checking for the logs directory..."
+echo "Prune: Checking for the logs directory..."
 if [[ ! -d "$LOG_DIR" ]]; then
-  echo "Creating the logs directory..."
+  echo "Prune: Creating the logs directory..."
   if ! mkdir -p "${LOG_DIR}"; then
-    echo "Failed to create log directory." >&2
+    echo "Prune: Failed to create log directory." >&2
     exit 1
   fi
-  echo "Logs directory created."
+  echo "Prune: Logs directory created."
 else
-  echo "Logs directory already exists."
+  echo "Prune: Logs directory already exists."
 fi
 
 # Ensure the agents directory exists.
-echo "Checking for the LaunchAgents directory..."
+echo "Prune: Checking for the LaunchAgents directory..."
 if [[ ! -d "$LIB_AGENTS" ]]; then
-  echo "Creating the LaunchAgents directory..."
+  echo "Prune: Creating the LaunchAgents directory..."
   if ! mkdir -p "${LIB_AGENTS}"; then
-    echo "Failed to create LaunchAgents directory." >&2
+    echo "Prune: Failed to create LaunchAgents directory." >&2
     exit 1
   fi
-  echo "LaunchAgents directory created."
+  echo "Prune: LaunchAgents directory created."
 else
-  echo "LaunchAgents directory already exists."
+  echo "Prune: LaunchAgents directory already exists."
 fi
 
 # Verify if the source agent file exists.
 echo "Checking for the agent source file..."
 if [[ ! -f "$AGENT_SOURCE" ]]; then
-  echo "Agent source file not found: ${AGENT_SOURCE}" >&2
+  echo "Prune: Agent source file not found: ${AGENT_SOURCE}" >&2
   exit 1
 else
   # Update plist file with actual home directory.
   sed -i '' "s|@USER_HOME@|${HOME}|g" "${AGENT_SOURCE}"
-  echo "Updated the home directory in the Agent."
+  echo "Prune: Updated the home directory in the Agent."
 fi
 
 # Create a symbolic link for the agent.
-echo "Setting up the agent symbolic link..."
+echo "Prune: Setting up the agent symbolic link..."
 if [[ ! -L "$AGENT_TARGET" ]]; then
   if ! ln -s "${AGENT_SOURCE}" "${AGENT_TARGET}"; then
-    echo "Failed to create symbolic link for the agent." >&2
+    echo "Prune: Failed to create symbolic link for the agent." >&2
     exit 1
   else
-    echo "Symbolic link created for the agent."
+    echo "Prune: Symbolic link created for the agent."
   fi
 else
-  echo "Symbolic link for the agent already exists."
+  echo "Prune: Symbolic link for the agent already exists."
 fi
 
 # Load the agent.
-echo "Loading the agent..."
+echo "Prune: Loading agent..."
 if [[ -f "$AGENT_TARGET" ]]; then
   if ! launchctl load "${AGENT_TARGET}"; then
-    echo "Failed to load the agent." >&2
+    echo "Prune: Failed to load the agent." >&2
     exit 1
   else
-    echo "Agent loaded successfully."
+    echo "Prune: Agent loaded successfully."
   fi
 else
-  echo "Agent file does not exist, no need to load."
+  echo "Prune: Agent file does not exist, no need to load."
 fi
 
 # Update .zshrc with Prune alias.
 if [[ -f "$ZSHRC" ]]; then
-  echo "Updating .zshrc..."
+  echo "Prune: Updating .zshrc..."
 
   # Check if the alias already exists.
   if ! grep -q "alias prune=" "${ZSHRC}"; then
     echo "" >> "${ZSHRC}"
-    echo "# Run the Prune script." >> "${ZSHRC}"
-    echo "alias prune='${HOME}/prune/scripts/prune.zsh'" >> "${ZSHRC}"
-    echo "Prune alias added to .zshrc."
+    echo "# Launch Prune." >> "${ZSHRC}"
+    echo "alias prune='${HOME}/prune/script/prune.zsh'" >> "${ZSHRC}"
+    echo "Prune: Alias added to .zshrc."
   else
-    echo "Prune alias already exists in .zshrc."
+    echo "Prune: Alias already exists in .zshrc."
   fi
 else
   # .zshrc not found, create a new one.
   echo ".zshrc not found, creating a new one..."
   if ! touch "${ZSHRC}"; then
-    echo "Failed to create .zshrc." >&2
+    echo "Prune: Failed to create .zshrc." >&2
     exit 1
   fi
 
   # Add the alias to the new .zshrc file.
-  echo "Adding 'prune' alias to new .zshrc..."
+  echo "Prune: Adding alias to new .zshrc..."
   echo "" >> "${ZSHRC}"
-  echo "# Run the Prune script." >> "${ZSHRC}"
-  echo "alias prune='${HOME}/prune/scripts/prune.zsh'" >> "${ZSHRC}"
-  echo "Prune alias added to a new .zshrc."
+  echo "# Launch Prune." >> "${ZSHRC}"
+  echo "alias prune='${HOME}/prune/script/prune.zsh'" >> "${ZSHRC}"
+  echo "Prune: Alias added to a new .zshrc."
 fi
 
 # Attempt to reload .zshrc to apply changes.
 if ! source "${ZSHRC}" &>/dev/null; then
-  echo "Please source .zshrc manually to apply changes." >&2
+  echo "Prune: Failed to reload .zshrc. Please reload manually to apply changes." >&2
 fi
 
-echo "Prune setup complete."
+echo "Prune: Setup complete."
