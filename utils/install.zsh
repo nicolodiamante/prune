@@ -29,7 +29,7 @@ ROOT_DIR="${0:h}/.."
 LOG_DIR="${ROOT_DIR}/log"
 
 # Ensure the logs directory exists.
-echo "Prune: Checking for the logs directory..."
+echo "\nPrune: Checking for the logs directory..."
 if [[ ! -d "$LOG_DIR" ]]; then
   echo "Prune: Creating the logs directory..."
   if ! mkdir -p "${LOG_DIR}"; then
@@ -55,7 +55,7 @@ else
 fi
 
 # Verify if the source agent file exists.
-echo "Checking for the agent source file..."
+echo "\nChecking for the agent source file..."
 if [[ ! -f "$AGENT_SOURCE" ]]; then
   echo "Prune: Agent source file not found: ${AGENT_SOURCE}" >&2
   exit 1
@@ -66,7 +66,7 @@ else
 fi
 
 # Create a symbolic link for the agent.
-echo "Prune: Setting up the agent symbolic link..."
+echo "\nPrune: Setting up the agent symbolic link..."
 if [[ ! -L "$AGENT_TARGET" ]]; then
   if ! ln -s "${AGENT_SOURCE}" "${AGENT_TARGET}"; then
     echo "Prune: Failed to create symbolic link for the agent." >&2
@@ -79,7 +79,7 @@ else
 fi
 
 # Load the agent.
-echo "Prune: Loading agent..."
+echo "\nPrune: Loading agent..."
 if [[ -f "$AGENT_TARGET" ]]; then
   if ! launchctl load "${AGENT_TARGET}"; then
     echo "Prune: Failed to load the agent." >&2
@@ -95,6 +95,25 @@ fi
 if [[ -f "$ZSHRC" ]]; then
   echo "Prune: Updating .zshrc..."
 
+  # Ask the user if they want to create a backup.
+  read -q "REPLY?Found an existing .zshrc in ${ZSHRC}. Do you want to create a backup? [y/N] "
+  echo ""
+  if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+    # Backup existing file
+    ZSHRC_BACKUP="${ZSHRC}_$(date "+%Y%m%d%H%M%S").bak"
+    echo "Creating backup of .zshrc as ${ZSHRC_BACKUP}..."
+
+    if cp "${ZSHRC}" "${ZSHRC_BACKUP}"; then
+      echo "Prune: Backup successful."
+    else
+      echo "\nPrune: Failed to backup .zshrc. Aborting operation." >&2
+      exit 1
+    fi
+  else
+    # If the response is not 'yes', proceed without creating a backup.
+    echo "\nPrune: Proceeding without creating a backup."
+  fi
+
   # Check if the alias already exists.
   if ! grep -q "alias prune=" "${ZSHRC}"; then
     echo "" >> "${ZSHRC}"
@@ -102,18 +121,18 @@ if [[ -f "$ZSHRC" ]]; then
     echo "alias prune='${HOME}/prune/script/prune.zsh'" >> "${ZSHRC}"
     echo "Prune: Alias added to .zshrc."
   else
-    echo "Prune: Alias already exists in .zshrc."
+    echo "\nPrune: Alias already exists in .zshrc."
   fi
 else
   # .zshrc not found, create a new one.
-  echo ".zshrc not found, creating a new one..."
+  echo "\nPrune: .zshrc not found, creating a new one..."
   if ! touch "${ZSHRC}"; then
     echo "Prune: Failed to create .zshrc." >&2
     exit 1
   fi
 
   # Add the alias to the new .zshrc file.
-  echo "Prune: Adding alias to new .zshrc..."
+  echo "\nPrune: Adding alias to new .zshrc..."
   echo "" >> "${ZSHRC}"
   echo "# Launch Prune." >> "${ZSHRC}"
   echo "alias prune='${HOME}/prune/script/prune.zsh'" >> "${ZSHRC}"
@@ -125,4 +144,5 @@ if ! source "${ZSHRC}" &>/dev/null; then
   echo "Prune: Failed to reload .zshrc. Please reload manually to apply changes." >&2
 fi
 
-echo "Prune: Setup complete."
+# Prints a success message.
+echo "\nPrune: Setup complete."
