@@ -149,7 +149,18 @@ This command will instruct Prune to specifically remove the `"QuickTime Player"`
 
 ### Accessing Help
 
-Prune comes with a built-in help option to provide quick access to its usage instructions right from the terminal. Whether you're unsure about how to reset the Launchpad layout or need a reminder about how to launch Prune, the help option is there to assist you. To access this, simply type `prune --help` or `prune -h` in the terminal. This will display a summary of available options and how to use them.<br><br>
+Prune comes with a built-in help option to provide quick access to its usage instructions right from the terminal. Whether you're unsure about how to reset the Launchpad layout or need a reminder about how to launch Prune, the help option is there to assist you. To access this, simply type `prune --help` or `prune -h` in the terminal. This will display a summary of available options and how to use them.
+<br><br>
+
+## What's new in Prune
+
+### v1.1
+
+Release Highlights:
+
+- Dynamic Database Path Detection: The script now dynamically finds the correct com.apple.dock.launchpad database path for the current user. This enhancement ensures that the script works seamlessly on systems with multiple users, addressing the issue where the incorrect path might be selected.
+
+<br><br>
 
 ## Notes
 

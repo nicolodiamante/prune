@@ -49,10 +49,26 @@ for cmd in "${required_commands[@]}"; do
   fi
 done
 
+# Function to find the correct launchpad database path for the current user.
+find_launchpad_db() {
+  local user_db_paths
+  user_db_paths=($(find /private/var/folders -name com.apple.dock.launchpad 2>/dev/null))
+  for path in "${user_db_paths[@]}"; do
+    if [[ -d "$path" && -w "$path" ]]; then
+      echo "$path/db/db"
+      return 0
+    fi
+  done
+  echo "Error: unable to find writable Launchpad database." >&2
+  exit 1
+}
+
 # Function to remove a single app.
 remove_single_app() {
   local app_to_remove=$1
-  local sqlite_cmd="sqlite3 \$(find /private/var/folders -name com.apple.dock.launchpad)/db/db \"DELETE FROM apps WHERE title='$app_to_remove';\" && killall Dock"
+  local launchpad_db=$(find_launchpad_db)
+
+  local sqlite_cmd="sqlite3 ${launchpad_db} \"DELETE FROM apps WHERE title='$app_to_remove';\" && killall Dock"
 
   if ! sudo zsh -c "$sqlite_cmd" 2> "${LOG_FILE}"; then
     echo "Failed to remove ${app_to_remove}. Check log for details." >&2
@@ -97,6 +113,8 @@ fi
 
 # Function to update pruneops.zsh if the apps file has changed.
 update_pruneops() {
+  local launchpad_db=$(find_launchpad_db)
+
   # Read the new list of applications from the applications file.
   applications=("${(@f)$(awk -F"'" '/\047/ {print $2}' "$APPLICATIONS_FILE")}")
 
@@ -106,11 +124,11 @@ update_pruneops() {
 
   # Build the cleanup commands.
   for app in "${applications[@]:0:${#applications[@]}-1}"; do
-    echo -n "sqlite3 \$(find /private/var/folders -name com.apple.dock.launchpad)/db/db \"DELETE FROM apps WHERE title='$app';\"; " >> "${TEMP_FILE}"
+    echo -n "sqlite3 ${launchpad_db} \"DELETE FROM apps WHERE title='$app';\"; " >> "${TEMP_FILE}"
   done
 
   # Add the last command without the semicolon (;) divider, followed by '&& killall Dock'.
-  echo -n "sqlite3 \$(find /private/var/folders -name com.apple.dock.launchpad)/db/db \"DELETE FROM apps WHERE title='${applications[-1]}';\" && killall Dock" >> "${TEMP_FILE}"
+  echo -n "sqlite3 ${launchpad_db} \"DELETE FROM apps WHERE title='${applications[-1]}';\" && killall Dock" >> "${TEMP_FILE}"
 
   # Replace the existing pruneops.zsh file with the new commands
   mv "${TEMP_FILE}" "${PRUNEOPS_FILE}"
